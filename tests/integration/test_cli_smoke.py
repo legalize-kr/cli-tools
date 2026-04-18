@@ -39,4 +39,4 @@ def test_readme_mentions_budget() -> None:
     from pathlib import Path
 
     readme = (Path(__file__).parent.parent.parent / "README.md").read_text()
-    assert "60 unauthenticated requests/hour per IP" in readme
+    assert "시간당 60회" in readme
