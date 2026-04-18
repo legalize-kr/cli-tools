@@ -1,0 +1,85 @@
+{
+  "sha": "abc1234",
+  "url": "https://api.github.com/repos/legalize-kr/legalize-kr/git/trees/abc1234",
+  "truncated": false,
+  "tree": [
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0001",
+      "size": 1024,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0002",
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/민법",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "0003",
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/민법/법률.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0004",
+      "size": 987654,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/상법/법률.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0005",
+      "size": 500000,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/상법/시행령.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0006",
+      "size": 100000,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/주택법/법률.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0007",
+      "size": 300000,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/주택법/시행령.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0008",
+      "size": 200000,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "kr/주택법/시행규칙.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0009",
+      "size": 50000,
+      "url": "https://api.github.com/..."
+    },
+    {
+      "path": "metadata.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0010",
+      "size": 2048,
+      "url": "https://api.github.com/..."
+    }
+  ]
+}

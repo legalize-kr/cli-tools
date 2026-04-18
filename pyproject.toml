@@ -1,0 +1,75 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "legalize-cli"
+version = "0.1.0"
+description = "API-first CLI for Korean laws and precedents mirrored by legalize-kr."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [
+    { name = "legalize-kr contributors" },
+]
+keywords = ["korean", "law", "legalize-kr", "cli", "github"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Legal Industry",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: Korean",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "typer>=0.12",
+    "httpx>=0.27",
+    "pydantic>=2.6",
+    "PyYAML>=6.0",
+    "regex>=2024.4.16",
+    "python-dateutil>=2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-httpx>=0.30",
+    "coverage>=7.4",
+]
+mcp = [
+    "mcp>=1.0",
+]
+
+[project.scripts]
+legalize = "legalize_cli.__main__:app"
+legalize-mcp = "legalize_cli.mcp_server:main"
+
+[project.urls]
+Homepage = "https://github.com/legalize-kr"
+Repository = "https://github.com/legalize-kr/legalize-cli"
+Issues = "https://github.com/legalize-kr/legalize-cli/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/legalize_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/README.md",
+    "/LICENSE",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "live: hits real GitHub, requires LEGALIZE_CLI_LIVE=1",
+]

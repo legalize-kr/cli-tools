@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "cccbbb0000000000000000000000000000000003",
+    "commit": {
+      "author": {"name": "bot", "email": "bot@legalize.kr", "date": "2022-12-27T12:00:00+09:00"},
+      "committer": {"name": "bot", "email": "bot@legalize.kr", "date": "2022-12-28T01:00:00+00:00"},
+      "message": "민법 [19098]"
+    }
+  },
+  {
+    "sha": "bbbccc0000000000000000000000000000000002",
+    "commit": {
+      "author": {"name": "bot", "email": "bot@legalize.kr", "date": "2021-01-26T12:00:00+09:00"},
+      "committer": {"name": "bot", "email": "bot@legalize.kr", "date": "2021-01-27T02:00:00+00:00"},
+      "message": "민법 [17905] 2"
+    }
+  },
+  {
+    "sha": "ca7d5c5000000000000000000000000000000001",
+    "commit": {
+      "author": {"name": "bot", "email": "bot@legalize.kr", "date": "2017-10-31T12:00:00+09:00"},
+      "committer": {"name": "bot", "email": "bot@legalize.kr", "date": "2017-11-01T03:00:00+00:00"},
+      "message": "민법 [15285]"
+    }
+  }
+]

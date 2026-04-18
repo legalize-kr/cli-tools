@@ -1,0 +1,31 @@
+{
+  "sha": "abc1234",
+  "url": "https://api.github.com/repos/legalize-kr/legalize-kr/git/trees/abc1234",
+  "truncated": false,
+  "tree": [
+    {"path": "README.md", "mode": "100644", "type": "blob", "sha": "0001", "size": 1024},
+    {"path": "kr", "mode": "040000", "type": "tree", "sha": "0002"},
+    {"path": "kr/.gitkeep", "mode": "100644", "type": "blob", "sha": "ff01", "size": 0},
+    {"path": "kr/민법", "mode": "040000", "type": "tree", "sha": "0003"},
+    {"path": "kr/민법/법률.md", "mode": "100644", "type": "blob", "sha": "0004", "size": 987654},
+    {"path": "kr/민법/시행령.md", "mode": "100644", "type": "blob", "sha": "0005a", "size": 100000},
+    {"path": "kr/상법/법률.md", "mode": "100644", "type": "blob", "sha": "0005", "size": 500000},
+    {"path": "kr/상법/시행령.md", "mode": "100644", "type": "blob", "sha": "0006", "size": 100000},
+    {"path": "kr/상법/시행규칙.md", "mode": "100644", "type": "blob", "sha": "0006b", "size": 50000},
+    {"path": "kr/주택법/법률.md", "mode": "100644", "type": "blob", "sha": "0007", "size": 300000},
+    {"path": "kr/주택법/시행령.md", "mode": "100644", "type": "blob", "sha": "0008", "size": 200000},
+    {"path": "kr/주택법/시행규칙.md", "mode": "100644", "type": "blob", "sha": "0009", "size": 50000},
+    {"path": "kr/건축법/법률.md", "mode": "100644", "type": "blob", "sha": "0010a", "size": 200000},
+    {"path": "kr/건축법/시행령.md", "mode": "100644", "type": "blob", "sha": "0010b", "size": 150000},
+    {"path": "kr/건축법/대통령령.md", "mode": "100644", "type": "blob", "sha": "0010c", "size": 150000},
+    {"path": "kr/국세기본법/법률.md", "mode": "100644", "type": "blob", "sha": "0011a", "size": 400000},
+    {"path": "kr/국세기본법/대통령령.md", "mode": "100644", "type": "blob", "sha": "0011b", "size": 200000},
+    {"path": "kr/형법/법률.md", "mode": "100644", "type": "blob", "sha": "0012", "size": 350000},
+    {"path": "kr/형법/시행규칙.md", "mode": "100644", "type": "blob", "sha": "0012b", "size": 50000},
+    {"path": "kr/노동법/법률.md", "mode": "100644", "type": "blob", "sha": "0013", "size": 300000},
+    {"path": "kr/노동법/시행령.md", "mode": "100644", "type": "blob", "sha": "0013b", "size": 150000},
+    {"path": "metadata.json", "mode": "100644", "type": "blob", "sha": "fff0", "size": 2048},
+    {"path": ".github", "mode": "040000", "type": "tree", "sha": "fff1"},
+    {"path": ".github/workflows/main.yml", "mode": "100644", "type": "blob", "sha": "fff2", "size": 500}
+  ]
+}
