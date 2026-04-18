@@ -29,11 +29,10 @@ from .laws.asof import resolve_as_of
 from .laws.frontmatter import parse as parse_frontmatter
 from .laws.list import enumerate_laws, filter_and_paginate
 from .laws.revisions import get_revisions
+from .precedents.enumerate import enumerate_precedents
 from .precedents.fetch import fetch_by_id_or_path
-from .precedents.index import fetch_precedent_index
 from .precedents.list import list_precedents
 from .search.code_search import code_search_items
-from .search.metadata_search import metadata_search_items
 from .search.strategies import select_strategy
 from .search.tree_filter import tree_filter_items
 from .util.article_parse import parse_article_query
@@ -304,11 +303,13 @@ def search(
                     )
                 )
             else:
-                try:
-                    index = fetch_precedent_index(client, cache)
-                    items.extend(metadata_search_items(index, keyword))
-                except LegalizeError as exc:
-                    warnings.append(f"판례 검색 건너뜀: {exc}")
+                items.extend(
+                    tree_filter_items(
+                        client, cache, keyword,
+                        repo=PRECEDENTS_REPO,
+                        source="precedents",
+                    )
+                )
 
         items = items[:limit]
     except LegalizeError as e:
@@ -347,9 +348,9 @@ def precedents_list(
     """
     client, cache = _make_client()
     try:
-        index = fetch_precedent_index(client, cache)
+        entries = enumerate_precedents(client, cache)
         total, window, next_page = list_precedents(
-            index, court=court, type_=type_, page=page, page_size=page_size
+            entries, court=court, type_=type_, page=page, page_size=page_size
         )
     except LegalizeError as e:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
@@ -379,8 +380,7 @@ def precedents_get(identifier: str) -> str:
     """
     client, cache = _make_client()
     try:
-        index = fetch_precedent_index(client, cache)
-        path, body = fetch_by_id_or_path(client, cache, index, identifier)
+        path, body = fetch_by_id_or_path(client, cache, identifier)
     except LegalizeError as e:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
     finally:

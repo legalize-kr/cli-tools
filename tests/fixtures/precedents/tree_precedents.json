@@ -1,0 +1,20 @@
+{
+  "sha": "abc123def456",
+  "truncated": false,
+  "tree": [
+    {"path": ".gitignore", "type": "blob", "sha": "aaa001", "size": 50},
+    {"path": "README.md", "type": "blob", "sha": "aaa002", "size": 100},
+    {"path": "가사", "type": "tree", "sha": "aaa003", "size": null},
+    {"path": "가사/대법원", "type": "tree", "sha": "aaa004", "size": null},
+    {"path": "가사/대법원/2000므1257_본소_1264_반소.md", "type": "blob", "sha": "bbb001", "size": 4321},
+    {"path": "민사", "type": "tree", "sha": "aaa005", "size": null},
+    {"path": "민사/대법원", "type": "tree", "sha": "aaa006", "size": null},
+    {"path": "민사/대법원/2000다10048.md", "type": "blob", "sha": "bbb002", "size": 5678},
+    {"path": "민사/대법원/2015다12345.md", "type": "blob", "sha": "bbb003", "size": 9012},
+    {"path": "형사", "type": "tree", "sha": "aaa007", "size": null},
+    {"path": "형사/대법원", "type": "tree", "sha": "aaa008", "size": null},
+    {"path": "형사/대법원/2018도11111.md", "type": "blob", "sha": "bbb004", "size": 3456},
+    {"path": "형사/하급심", "type": "tree", "sha": "aaa009", "size": null},
+    {"path": "형사/하급심/2019고합987.md", "type": "blob", "sha": "bbb005", "size": 7890}
+  ]
+}

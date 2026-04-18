@@ -1,58 +1,45 @@
-"""Fetch a single precedent markdown by path or 사건번호/판례일련번호."""
+"""Fetch a single precedent markdown by path or 사건번호."""
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
-from ..config import OWNER, PRECEDENTS_REPO
+from ..config import DEFAULT_BRANCH, OWNER, PRECEDENTS_REPO
 from ..github.contents import get_file_raw
+from ..github.trees import get_tree
 from ..http import GitHubClient
 from ..util.errors import NotFoundError
-from .model import PrecedentEntry
 
 
 def fetch_by_id_or_path(
     client: GitHubClient,
     cache,  # noqa: ANN001 - passed through for API symmetry
-    index: Dict[str, PrecedentEntry],
     arg: str,
     *,
     owner: str = OWNER,
     repo: str = PRECEDENTS_REPO,
+    ref: str = DEFAULT_BRANCH,
 ) -> Tuple[str, bytes]:
-    """Return ``(path, markdown_bytes)`` for a precedent given by path or id.
-
-    :raises NotFoundError: no matching entry was found.
-    """
-    path = _resolve_path(index, arg)
-    try:
-        body = get_file_raw(client, owner, repo, path)
-    except NotFoundError as exc:
-        raise NotFoundError(f"precedent path not reachable: {path}") from exc
-    return path, body
-
-
-def _resolve_path(index: Dict[str, PrecedentEntry], arg: str) -> str:
-    """Return a repo-relative path for ``arg``.
+    """Return ``(path, markdown_bytes)`` for a precedent given by path or 사건번호.
 
     Resolution order:
 
-    1. Path-looking input (contains ``/`` and ends with ``.md``) is passed
-       through verbatim.
-    2. Exact ``판례일련번호`` key.
-    3. Exact ``사건번호`` match in the index.
+    1. Path-looking input (contains ``/`` and ends with ``.md``) → direct fetch.
+    2. 사건번호 → scan tree for a blob whose filename stem matches.
+
+    :raises NotFoundError: no matching entry was found.
     """
     if "/" in arg and arg.endswith(".md"):
-        return arg
+        body = get_file_raw(client, owner, repo, arg)
+        return arg, body
 
-    # ID lookup.
-    if arg in index:
-        return index[arg].path
-
-    # 사건번호 scan.
-    hits = [e for e in index.values() if e.사건번호 == arg]
+    # 사건번호: scan tree for a matching filename stem.
+    entries = get_tree(client, owner, repo, ref)
+    hits = [e for e in entries if e.type == "blob" and e.path.endswith(f"/{arg}.md")]
     if len(hits) == 1:
-        return hits[0].path
+        path = hits[0].path
+        body = get_file_raw(client, owner, repo, path)
+        return path, body
     if len(hits) > 1:
         raise NotFoundError(
             f"ambiguous 사건번호 {arg!r} ({len(hits)} hits); pass the full path instead"

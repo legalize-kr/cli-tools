@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Literal
 
 Scope = Literal["laws", "precedents", "all"]
-Strategy = Literal["code", "tree", "metadata"]
+Strategy = Literal["code", "tree"]
 
 
 def select_strategy(
@@ -16,19 +16,20 @@ def select_strategy(
 ) -> Strategy:
     """Return the :data:`Strategy` this run should use.
 
-    - Explicit user choice (``code`` / ``tree`` / ``metadata``) wins.
-    - ``auto`` + token + (laws | all) → ``code``.
-    - ``auto`` + no token + precedents → ``metadata``.
-    - ``auto`` + no token + laws | all → ``tree``.
+    - Explicit user choice (``code`` / ``tree``) wins.
+    - ``auto`` + token → ``code``.
+    - ``auto`` + no token → ``tree``.
     """
-    if user_choice in ("code", "tree", "metadata"):
+    if user_choice in ("code", "tree"):
         return user_choice  # type: ignore[return-value]
+
+    # Legacy alias kept for backwards-compat; treated as tree.
+    if user_choice == "metadata":
+        return "tree"
 
     if user_choice != "auto":
         raise ValueError(f"unknown strategy {user_choice!r}")
 
-    if scope == "precedents":
-        return "metadata"
     if token_present:
         return "code"
     return "tree"

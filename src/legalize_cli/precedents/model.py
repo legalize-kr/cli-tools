@@ -1,28 +1,24 @@
-"""Pydantic model for a precedent index entry.
+"""Pydantic model for a precedent entry derived from the repo tree path.
 
-Keys use the Korean field names as they appear in ``precedent-kr/metadata.json``.
+Path structure: ``{사건종류}/{법원명}/{사건번호}.md``
+e.g. ``민사/대법원/2000다10048.md``
 """
 
 from __future__ import annotations
 
-from typing import Optional
-
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class PrecedentEntry(BaseModel):
-    """A single entry in ``precedent-kr/metadata.json``."""
+    """A single precedent entry derived from the tree path."""
 
-    model_config = ConfigDict(extra="allow", populate_by_name=True)
+    model_config = ConfigDict(extra="forbid")
 
-    판례일련번호: str
     path: str
-    사건번호: str = ""
-    사건명: str = ""
-    선고일자: Optional[str] = None
-    법원명: str = ""
-    사건종류: str = ""
-    판결유형: str = Field(default="")
+    사건종류: str
+    법원명: str
+    사건번호: str
+    판례일련번호: str  # = path; stable identifier without metadata.json
 
 
 __all__ = ["PrecedentEntry"]

@@ -7,7 +7,7 @@ from typing import Optional
 
 import typer
 
-from ..precedents.index import fetch_precedent_index
+from ..precedents.enumerate import enumerate_precedents
 from ..precedents.list import list_precedents
 from ..util.cli_common import (
     build_global_opts,
@@ -38,14 +38,14 @@ def list_precedents_cmd(
     cache_dir: Optional[Path] = typer.Option(None, "--cache-dir"),
     offline: bool = typer.Option(False, "--offline"),
 ) -> None:
-    """List precedents from ``precedent-kr/metadata.json``."""
+    """List precedents from the precedent-kr tree."""
     opts = build_global_opts(token, no_cache, cache_dir, offline, json_output)
     client, cache = make_client(opts)
 
     try:
-        index = fetch_precedent_index(client, cache)
+        entries = enumerate_precedents(client, cache)
         total, window, next_page = list_precedents(
-            index, court=court, type_=type_, page=page, page_size=page_size
+            entries, court=court, type_=type_, page=page, page_size=page_size
         )
     except LegalizeError as exc:
         raise handle_domain_error(exc) from exc
@@ -71,10 +71,7 @@ def list_precedents_cmd(
 
     truncate_at = 50
     for entry in window[:truncate_at]:
-        typer.echo(
-            f"{entry.선고일자 or '?':<10}  {entry.법원명:<8}  "
-            f"{entry.사건번호}  {entry.사건명}"
-        )
+        typer.echo(f"{entry.법원명:<12}  {entry.사건종류:<6}  {entry.사건번호}")
     if len(window) > truncate_at:
         typer.echo(f"... +{len(window) - truncate_at} more (page_size={page_size})")
     typer.echo(f"(page {page}; total={total})")

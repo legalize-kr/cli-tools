@@ -8,9 +8,7 @@ from typing import List, Optional
 import typer
 
 from ..config import LAWS_REPO, OWNER, PRECEDENTS_REPO
-from ..precedents.index import fetch_precedent_index
 from ..search.code_search import code_search_items
-from ..search.metadata_search import metadata_search_items
 from ..search.strategies import select_strategy
 from ..search.tree_filter import tree_filter_items
 from ..util.cli_common import (
@@ -21,12 +19,9 @@ from ..util.cli_common import (
 )
 from ..util.errors import AuthError, LegalizeError
 
-def register(app: typer.Typer) -> None:
-    """Attach the ``search`` command to ``app``.
 
-    We use ``app.command("search")`` rather than ``add_typer`` because
-    ``search`` is a single-argument leaf command, not a subcommand group.
-    """
+def register(app: typer.Typer) -> None:
+    """Attach the ``search`` command to ``app``."""
     app.command("search", help="Keyword search over laws and precedents.")(search_cmd)
 
 
@@ -53,6 +48,7 @@ def search_cmd(
     opts = build_global_opts(token, no_cache, cache_dir, offline, json_output)
     client, cache = make_client(opts)
     warnings: List[str] = []
+    chosen = strategy
 
     try:
         chosen = select_strategy(
@@ -76,18 +72,9 @@ def search_cmd(
                 )
             )
         if scope in ("precedents", "all"):
-            if chosen == "code" and client.token_source != "none":
-                items.extend(
-                    code_search_items(
-                        client, keyword, repo=f"{OWNER}/{PRECEDENTS_REPO}", source="precedents"
-                    )
-                )
-            else:
-                try:
-                    index = fetch_precedent_index(client, cache)
-                    items.extend(metadata_search_items(index, keyword))
-                except LegalizeError as exc:
-                    warnings.append(f"판례 검색 건너뜀: {exc}")
+            items.extend(
+                _precedents_items(client, cache, keyword, chosen, warnings)
+            )
 
         items = items[:limit]
     except LegalizeError as exc:
@@ -132,13 +119,9 @@ def _laws_items(
                 client, keyword, repo=f"{OWNER}/{LAWS_REPO}", source="laws"
             )
         except AuthError:
-            warnings.append(
-                "code-search failed — falling back to tree"
-            )
+            warnings.append("code-search failed — falling back to tree")
     if client.token_source == "none":
-        warnings.append(
-            "no GITHUB_TOKEN — code-search unavailable; using tree strategy"
-        )
+        warnings.append("no GITHUB_TOKEN — code-search unavailable; using tree strategy")
     return tree_filter_items(
         client,
         cache,
@@ -146,6 +129,29 @@ def _laws_items(
         heavy_content_scan=heavy,
         yes_exhaust=yes_exhaust,
         source="laws",
+    )
+
+
+def _precedents_items(
+    client,
+    cache,
+    keyword: str,
+    chosen: str,
+    warnings: List[str],
+) -> List[dict]:
+    if chosen == "code" and client.token_source != "none":
+        try:
+            return code_search_items(
+                client, keyword, repo=f"{OWNER}/{PRECEDENTS_REPO}", source="precedents"
+            )
+        except AuthError:
+            warnings.append("code-search failed for precedents — falling back to tree")
+    return tree_filter_items(
+        client,
+        cache,
+        keyword,
+        repo=PRECEDENTS_REPO,
+        source="precedents",
     )
 
 
