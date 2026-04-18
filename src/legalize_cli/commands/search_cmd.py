@@ -83,8 +83,11 @@ def search_cmd(
                     )
                 )
             else:
-                index = fetch_precedent_index(client, cache)
-                items.extend(metadata_search_items(index, keyword))
+                try:
+                    index = fetch_precedent_index(client, cache)
+                    items.extend(metadata_search_items(index, keyword))
+                except LegalizeError as exc:
+                    warnings.append(f"판례 검색 건너뜀: {exc}")
 
         items = items[:limit]
     except LegalizeError as exc:
