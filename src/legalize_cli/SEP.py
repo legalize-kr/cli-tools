@@ -7,6 +7,6 @@ Must be kept in sync with:
 - compiler-for-precedent/src/render.rs       (SEP constant)
 """
 
-SEP: str = "--"
+SEP: str = "_"
 
 __all__ = ["SEP"]

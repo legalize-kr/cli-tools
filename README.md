@@ -315,7 +315,7 @@ legalize precedents get <사건번호|path> [--json] [--legacy-map <path>]
 ```
 
 조회 순서:
-1. **새 복합 파일명** (`{법원}__{날짜}__{사건번호}.md`) 우선 검색
+1. **새 복합 파일명** (`{법원명}_{선고일자}_{사건번호}.md`) 우선 검색
 2. **레거시 파일명** (`{사건번호}.md`) fallback
 3. **`--legacy-map`** 지정 시 `legacy-paths.json` 매핑 테이블 최종 fallback
 

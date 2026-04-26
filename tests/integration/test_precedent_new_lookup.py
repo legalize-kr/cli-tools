@@ -1,7 +1,7 @@
 """Integration tests for the updated fetch_by_id_or_path lookup chain.
 
 Four scenarios (all using mocked GitHub API):
-  1. new_grammar  — composite filename ``*--{caseno}.md`` found in tree
+  1. new_grammar  — composite filename ``*_{caseno}.md`` found in tree
   2. legacy       — old ``{caseno}.md`` filename found after new-grammar miss
   3. legacy_map   — neither grammar matches; fallback via legacy-paths.json
   4. disambiguation — >1 new-grammar hits raise NotFoundError
@@ -34,8 +34,9 @@ def _make_tree(paths: list[str]) -> dict:
 
 SAMPLE_BYTES = b"---\n\xec\x82\xac\xea\xb1\xb4\xeb\xb2\x88\xed\x98\xb8: 2022\xeb\x8b\xa412345\n---\n\n# \xed\x8c\x90\xeb\xa1\x80"
 
-# SEP = "--" as determined by pipeline preflight
-SEP = "--"
+# SEP = "_" (single underscore) — kept in lockstep with
+# legalize-pipeline/precedents/converter.py and src/legalize_cli/SEP.py
+SEP = "_"
 
 
 # ---------------------------------------------------------------------------
