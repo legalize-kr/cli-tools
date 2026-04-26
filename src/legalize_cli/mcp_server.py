@@ -372,15 +372,19 @@ def precedents_list(
 
 
 @mcp.tool()
-def precedents_get(identifier: str) -> str:
+def precedents_get(identifier: str, legacy_map_path: Optional[str] = None) -> str:
     """판례 전문을 조회합니다.
 
     Args:
         identifier: 사건번호 (예: 2022다12345), 판례일련번호, 또는 저장소 상대 경로
+        legacy_map_path: legacy-paths.json 파일 경로 (구 파일명→신 파일명 폴백 조회용).
+            생략 시 폴백 없이 조회.
     """
     client, cache = _make_client()
     try:
-        path, body = fetch_by_id_or_path(client, cache, identifier)
+        path, body = fetch_by_id_or_path(
+            client, cache, identifier, legacy_map=legacy_map_path or None
+        )
     except LegalizeError as e:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
     finally:

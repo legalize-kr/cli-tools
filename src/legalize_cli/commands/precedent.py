@@ -27,13 +27,18 @@ def get_precedent_cmd(
     no_cache: bool = typer.Option(False, "--no-cache"),
     cache_dir: Optional[Path] = typer.Option(None, "--cache-dir"),
     offline: bool = typer.Option(False, "--offline"),
+    legacy_map: Optional[Path] = typer.Option(
+        None,
+        "--legacy-map",
+        help="Path to legacy-paths.json for old→new filename fallback lookup.",
+    ),
 ) -> None:
     """Fetch a single precedent by 사건번호 or repo-relative path."""
     opts = build_global_opts(token, no_cache, cache_dir, offline, json_output)
     client, cache = make_client(opts)
 
     try:
-        path, body = fetch_by_id_or_path(client, cache, arg)
+        path, body = fetch_by_id_or_path(client, cache, arg, legacy_map=legacy_map)
     except LegalizeError as exc:
         raise handle_domain_error(exc) from exc
     finally:

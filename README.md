@@ -311,8 +311,13 @@ legalize precedents list [--court 대법원|하급심] [--type 민사|형사|가
 사건번호, 판례일련번호, 또는 경로로 단일 판례를 조회합니다.
 
 ```bash
-legalize precedents get <사건번호|path> [--json]
+legalize precedents get <사건번호|path> [--json] [--legacy-map <path>]
 ```
+
+조회 순서:
+1. **새 복합 파일명** (`{법원}__{날짜}__{사건번호}.md`) 우선 검색
+2. **레거시 파일명** (`{사건번호}.md`) fallback
+3. **`--legacy-map`** 지정 시 `legacy-paths.json` 매핑 테이블 최종 fallback
 
 ### `search` — 키워드 검색
 
