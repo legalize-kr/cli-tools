@@ -14,6 +14,9 @@ from .conftest import install_client_factory
 
 
 def test_search_no_token_uses_tree(monkeypatch, tree_fixture) -> None:
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
+    monkeypatch.delenv("LEGALIZE_GITHUB_TOKEN", raising=False)
+
     def handler(request: httpx.Request) -> httpx.Response:
         url = str(request.url)
         if "/git/trees/" in url:

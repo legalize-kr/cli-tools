@@ -20,7 +20,7 @@ def _transport(payload: list[dict]) -> httpx.MockTransport:
     return httpx.MockTransport(handler)
 
 
-def test_list_commits_parses_fixture_and_preserves_tz() -> None:
+def test_list_commits_parses_fixture_and_normalizes_to_kst() -> None:
     payload = json.loads(FIXTURE.read_text())
     client = GitHubClient(transport=_transport(payload), token=None, token_source="none")
 
@@ -30,11 +30,30 @@ def test_list_commits_parses_fixture_and_preserves_tz() -> None:
     first = commits[0]
     # SHA round-trips verbatim.
     assert first.sha.startswith("ca7d5c5")
-    # author_date carries +09:00 offset (critical: §5 Step 2 invariant).
+    # GitHub commit dates are normalized to KST for date-based law lookups.
     assert first.author_date.utcoffset() is not None
     assert first.author_date.utcoffset().total_seconds() == 9 * 3600
-    # committer_date independently parsed and preserved as UTC.
-    assert first.committer_date.utcoffset().total_seconds() == 0
+    assert first.committer_date.utcoffset().total_seconds() == 9 * 3600
+    assert first.committer_date.hour == 12
+
+
+def test_list_commits_converts_github_utc_author_date_to_kst() -> None:
+    payload = [
+        {
+            "sha": "abc123",
+            "commit": {
+                "author": {"date": "2026-04-30T03:00:00Z"},
+                "committer": {"date": "2026-04-30T04:30:00Z"},
+                "message": "UTC from GitHub",
+            },
+        }
+    ]
+    client = GitHubClient(transport=_transport(payload), token=None, token_source="none")
+
+    commit = list_commits(client, "legalize-kr", "legalize-kr", "kr/민법/법률.md")[0]
+
+    assert commit.author_date.isoformat() == "2026-04-30T12:00:00+09:00"
+    assert commit.committer_date.isoformat() == "2026-04-30T13:30:00+09:00"
 
 
 def test_list_commits_message_preserved() -> None:

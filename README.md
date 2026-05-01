@@ -475,10 +475,11 @@ CI에서 `tests/unit/test_json_schema_version.py`로 강제 검증합니다.
 | 1 | 일반 오류 |
 | 4 | 해당 날짜에 없음 |
 | 5 | 불명확한 헤딩 레벨 (파서) |
-| 6 | 조문을 찾을 수 없음 |
+| 6 | upstream force-push로 인한 캐시 일관성 오류 |
 | 7 | Rate limit 초과 / 인증 필요 |
-| 8 | 파서 오류 |
+| 8 | 인증 오류 |
 | 9 | 오프라인 모드이나 네트워크 필요 |
+| 10 | 파서 오류 |
 
 ## 캐시
 
@@ -532,7 +533,7 @@ pytest
 
 ### 카세트 재녹화
 
-테스트는 실제 GitHub API를 매번 호출하지 않고 `tests/fixtures/cassettes/`에 녹화된 HTTP 응답을 재생합니다. API 응답 형식이 바뀌거나 새 테스트 케이스를 추가할 때 실제 네트워크로 재녹화합니다.
+테스트는 실제 GitHub API를 매번 호출하지 않고 `tests/fixtures/`의 JSON·Markdown 픽스처와 `httpx.MockTransport`를 사용합니다. API 응답 형식이 바뀌거나 새 테스트 케이스를 추가할 때 실제 네트워크로 라이브 테스트를 실행해 픽스처를 갱신합니다.
 
 ```bash
 LEGALIZE_CLI_LIVE=1 ./scripts/record-cassettes.sh

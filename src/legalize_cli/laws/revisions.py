@@ -1,10 +1,9 @@
 """Fetch the revision history for a law path with fingerprint-based cache.
 
 The pipeline uses a synthetic ``12:00:00 +09:00`` author date on every commit
-(see plan §5 Step 2). This module is responsible for enforcing that
-invariant at runtime — if the offset ever drifts from ``+09:00`` we halt
-loudly via :class:`LegalizeError`. Silent tolerance of UTC would make
-every ``--date`` filter off by up to 9 hours.
+(see plan §5 Step 2). ``github.commits`` normalizes GitHub's API timestamps to
+KST before they reach this module, and this module keeps a defensive invariant
+check so ``--date`` filters never run against a non-KST timestamp.
 """
 
 from __future__ import annotations
@@ -32,8 +31,8 @@ def get_revisions(
 ) -> List[CommitInfo]:
     """Return commits for ``path``, newest first.
 
-    Asserts the first commit's author-date offset is ``+09:00``; any other
-    offset raises :class:`LegalizeError` per plan §9 Step 2.
+    Asserts the first parsed commit's author-date offset is ``+09:00``; any
+    other offset raises :class:`LegalizeError` per plan §9 Step 2.
 
     The ``list_fingerprint`` is computed and (when ``cache`` is supplied)
     compared against the previously-stored value; on mismatch, the cached

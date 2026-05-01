@@ -1,8 +1,9 @@
-"""Live smoke: 민법 latest commit is parseable and has ``+09:00`` author date."""
+"""Live smoke: 민법 latest commit is parseable."""
 
 from __future__ import annotations
 
 import json
+from datetime import date
 
 import pytest
 from typer.testing import CliRunner
@@ -18,4 +19,4 @@ def test_live_mingbeop_get() -> None:
     data = json.loads(result.output)
     assert data["law"] == "민법"
     assert data["schema_version"] == "1.0"
-    assert "+09:00" in data.get("resolved_commit_date", "")
+    date.fromisoformat(data["resolved_commit_date"])

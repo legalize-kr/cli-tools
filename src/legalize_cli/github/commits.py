@@ -2,21 +2,22 @@
 
 The commits endpoint is the backbone of Feature 3 (``as-of`` resolution): we
 filter by ``path=`` and ``until=`` to find the commit at or before a target
-date. We **preserve the original timezone offset** on ``author.date`` /
-``committer.date`` because the pipeline commits share a synthetic
-``+09:00`` author date — normalizing to UTC would destroy the only signal we
-use for KST-same-date tiebreaking.
+date. GitHub may return commit dates in UTC even when the pipeline created
+synthetic KST timestamps, so parsed dates are normalized to KST before the
+as-of resolver compares calendar days.
 """
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 from dateutil import parser as dateparser
 from pydantic import BaseModel, Field
 
 from ..http import GitHubClient
+
+_KST = timezone(timedelta(hours=9))
 
 
 class CommitInfo(BaseModel):
@@ -72,10 +73,17 @@ def _parse_commit(item: dict) -> CommitInfo:
 
     return CommitInfo(
         sha=item["sha"],
-        author_date=dateparser.isoparse(author["date"]),
-        committer_date=dateparser.isoparse(committer.get("date") or author["date"]),
+        author_date=_parse_kst(author["date"]),
+        committer_date=_parse_kst(committer.get("date") or author["date"]),
         message=commit.get("message", ""),
     )
+
+
+def _parse_kst(value: str) -> datetime:
+    dt = dateparser.isoparse(value)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(_KST)
 
 
 __all__ = ["CommitInfo", "list_commits"]
