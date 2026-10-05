@@ -187,6 +187,13 @@ legalize auth status --json
 
 ## MCP 서버 (LLM/에이전트 통합)
 
+현재 대화에 Legalize-KR MCP 도구가 이미 제공되면 로컬 설치 없이 먼저 호출합니다.
+법령은 `laws_get` 또는 `laws_article`로 조회하고, 판례·행정규칙·자치법규는
+검색이나 목록에서 받은 `path`를 해당 `*_get`의 `identifier`로 전달합니다.
+검색 결과는 문서 후보이므로 전문을 읽기 전 본문 내용을 확정하지 않습니다.
+현재 시행 중인 법령을 요청하면 `semantic="시행일자"`를 명시하고 파일 단위 제한을 밝힙니다.
+자세한 예시는 [스킬의 MCP 조회 흐름](https://github.com/legalize-kr/agent-skills/blob/main/skills/legalize-kr/references/mcp-workflows.md)을 참고하세요.
+
 Claude Desktop, Cursor 등 MCP 지원 클라이언트에 legalize-kr을 tool로 등록할 수 있습니다.
 
 `legalize-mcp`는 로컬 stdio MCP 서버입니다. Claude Desktop, Claude Code, Cursor, Gemini CLI 같은 호스트 앱이 이 명령을 실행하고 표준입출력으로 통신합니다.
