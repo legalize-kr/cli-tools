@@ -198,10 +198,9 @@ Claude Desktop, Cursor 등 MCP 지원 클라이언트에 legalize-kr을 tool로 
 
 `legalize-mcp`는 로컬 stdio MCP 서버입니다. Claude Desktop, Claude Code, Cursor, Gemini CLI 같은 호스트 앱이 이 명령을 실행하고 표준입출력으로 통신합니다.
 
-개발 중인 0.5.0의 로컬 MCP는 응답 `schema_version: "2.0"`이고 CLI의
-`--json`은 기존 `schema_version: "1.0"`을 유지합니다. 0.5.0이 공개되기 전에는
-아래 고정 버전 명령이 PyPI에서 설치되지 않습니다. 로컬 wheel로 검증한 뒤 별도
-승인을 받아 공개합니다. 별도 `remote-mcp` Worker 0.2.0은 같은 11개 도구와
+0.5.0의 로컬 MCP는 응답 `schema_version: "2.0"`이고 CLI의
+`--json`은 기존 `schema_version: "1.0"`을 유지합니다. 0.5.0은
+PyPI에 게시했으며 고정 버전의 설치와 MCP 도구 목록을 확인했습니다. 별도 `remote-mcp` Worker 0.2.1은 같은 11개 도구와
 MCP 응답 2.0을 HTTPS로 제공합니다. `https://mcp.legalize.kr/mcp`에는 호스트에
 설정한 Bearer 접근키가 필요하며 기존 로컬 stdio 설정을 바꾸지 않습니다.
 원격판의 별도 CPU·입력·비교 크기 제한은 [remote-mcp 안내](https://github.com/legalize-kr/remote-mcp)를 참고하세요.
