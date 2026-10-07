@@ -18,6 +18,8 @@ def _install_mock(monkeypatch, commits_fixture, body: bytes) -> None:
         url = str(request.url)
         if "/commits" in url:
             return httpx.Response(200, json=commits_fixture)
+        if "/contents/" in url and request.headers.get("accept") == "application/vnd.github+json":
+            return httpx.Response(200, json=[])
         if "/contents/" in url:
             return httpx.Response(200, content=body)
         return httpx.Response(404, json={"message": f"no route for {url}"})

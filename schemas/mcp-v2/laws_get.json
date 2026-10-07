@@ -1,0 +1,395 @@
+{
+  "$defs": {
+    "Frontmatter": {
+      "additionalProperties": true,
+      "description": "Laws-repo YAML frontmatter.\n\nObserved ``법령구분`` values include the canonical four plus ministry-\nspecific variants (e.g. ``국토교통부령``); we accept any string and only\nfilter when ``--category`` is passed.",
+      "properties": {
+        "공포번호": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "공포번호"
+        },
+        "공포일자": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "공포일자"
+        },
+        "법령ID": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "법령Id"
+        },
+        "법령MST": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "법령Mst"
+        },
+        "법령구분": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "법령구분"
+        },
+        "상태": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "상태"
+        },
+        "소관부처": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "소관부처"
+        },
+        "시행일자": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "시행일자"
+        },
+        "제목": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "제목"
+        },
+        "출처": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "출처"
+        }
+      },
+      "title": "Frontmatter",
+      "type": "object"
+    },
+    "LawVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date_scope": {
+          "const": "file",
+          "default": "file",
+          "title": "Effective Date Scope",
+          "type": "string"
+        },
+        "enforcement_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Enforcement Date"
+        },
+        "law_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Law Id"
+        },
+        "law_mst": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Law Mst"
+        },
+        "promulgation_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Promulgation Date"
+        },
+        "requested_date": {
+          "format": "date",
+          "title": "Requested Date",
+          "type": "string"
+        },
+        "resolved_commit_date": {
+          "format": "date",
+          "title": "Resolved Commit Date",
+          "type": "string"
+        },
+        "resolved_version_date": {
+          "format": "date",
+          "title": "Resolved Version Date",
+          "type": "string"
+        },
+        "semantic": {
+          "enum": [
+            "공포일자",
+            "시행일자"
+          ],
+          "title": "Semantic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "semantic",
+        "requested_date",
+        "resolved_version_date",
+        "resolved_commit_date"
+      ],
+      "title": "LawVersion",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "github_url": {
+          "title": "Github Url",
+          "type": "string"
+        },
+        "original_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Url"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref"
+        },
+        "ref_type": {
+          "enum": [
+            "commit",
+            "unknown"
+          ],
+          "title": "Ref Type",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "repository",
+        "path",
+        "ref_type",
+        "github_url"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "title": "Body",
+      "type": "string"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "frontmatter": {
+      "$ref": "#/$defs/Frontmatter"
+    },
+    "kind": {
+      "const": "laws.get",
+      "default": "laws.get",
+      "title": "Kind",
+      "type": "string"
+    },
+    "law": {
+      "title": "Law",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceReference"
+    },
+    "version": {
+      "$ref": "#/$defs/LawVersion"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "law",
+    "category",
+    "version",
+    "source",
+    "frontmatter",
+    "body"
+  ],
+  "title": "LawResult",
+  "type": "object"
+}

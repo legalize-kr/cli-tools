@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-from ..github.search_code import search_code
+from ..github.search_code import CodeSearchResult, search_code, search_code_detailed
 from ..http import GitHubClient
 from .unicode import normalize_query
 
@@ -35,4 +35,10 @@ def code_search_items(
     ]
 
 
-__all__ = ["code_search_items"]
+def code_search_detailed(
+    client: GitHubClient, query: str, *, repo: str, limit: int = 100
+) -> CodeSearchResult:
+    return search_code_detailed(client, normalize_query(query), repo=repo, limit=limit)
+
+
+__all__ = ["code_search_detailed", "code_search_items"]

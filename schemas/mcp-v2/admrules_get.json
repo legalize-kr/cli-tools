@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "github_url": {
+          "title": "Github Url",
+          "type": "string"
+        },
+        "original_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Url"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref"
+        },
+        "ref_type": {
+          "enum": [
+            "commit",
+            "unknown"
+          ],
+          "title": "Ref Type",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "repository",
+        "path",
+        "ref_type",
+        "github_url"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "body": {
+      "title": "Body",
+      "type": "string"
+    },
+    "body_format": {
+      "const": "markdown_with_frontmatter",
+      "default": "markdown_with_frontmatter",
+      "title": "Body Format",
+      "type": "string"
+    },
+    "identifier": {
+      "title": "Identifier",
+      "type": "string"
+    },
+    "kind": {
+      "const": "admrules.get",
+      "default": "admrules.get",
+      "title": "Kind",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/SourceReference"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "identifier",
+    "source",
+    "body"
+  ],
+  "title": "AdministrativeRuleDocumentResult",
+  "type": "object"
+}

@@ -1,0 +1,315 @@
+{
+  "$defs": {
+    "SearchDatasetOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_strategy": {
+          "enum": [
+            "code",
+            "tree",
+            "none"
+          ],
+          "title": "Actual Strategy",
+          "type": "string"
+        },
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Code"
+        },
+        "has_more": {
+          "title": "Has More",
+          "type": "boolean"
+        },
+        "searched_fields": {
+          "items": {
+            "enum": [
+              "body",
+              "path"
+            ],
+            "type": "string"
+          },
+          "title": "Searched Fields",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "fallback",
+            "error"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "total_matches": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Total Matches"
+        }
+      },
+      "required": [
+        "dataset",
+        "actual_strategy",
+        "searched_fields",
+        "status",
+        "total_matches",
+        "has_more",
+        "error_code"
+      ],
+      "title": "SearchDatasetOutcome",
+      "type": "object"
+    },
+    "SearchItem": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "match_type": {
+          "enum": [
+            "body",
+            "path"
+          ],
+          "title": "Match Type",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/SourceReference"
+        }
+      },
+      "required": [
+        "dataset",
+        "path",
+        "match_type",
+        "source"
+      ],
+      "title": "SearchItem",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "github_url": {
+          "title": "Github Url",
+          "type": "string"
+        },
+        "original_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Url"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref"
+        },
+        "ref_type": {
+          "enum": [
+            "commit",
+            "unknown"
+          ],
+          "title": "Ref Type",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "repository",
+        "path",
+        "ref_type",
+        "github_url"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "complete": {
+      "title": "Complete",
+      "type": "boolean"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/SearchItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "kind": {
+      "const": "search.result",
+      "default": "search.result",
+      "title": "Kind",
+      "type": "string"
+    },
+    "limit": {
+      "title": "Limit",
+      "type": "integer"
+    },
+    "outcomes": {
+      "items": {
+        "$ref": "#/$defs/SearchDatasetOutcome"
+      },
+      "title": "Outcomes",
+      "type": "array"
+    },
+    "query": {
+      "title": "Query",
+      "type": "string"
+    },
+    "requested_strategy": {
+      "enum": [
+        "auto",
+        "code",
+        "tree",
+        "metadata"
+      ],
+      "title": "Requested Strategy",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scope": {
+      "enum": [
+        "laws",
+        "precedents",
+        "admrules",
+        "ordinances",
+        "all"
+      ],
+      "title": "Scope",
+      "type": "string"
+    },
+    "truncated": {
+      "title": "Truncated",
+      "type": "boolean"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "query",
+    "scope",
+    "requested_strategy",
+    "limit",
+    "complete",
+    "truncated",
+    "outcomes",
+    "items"
+  ],
+  "title": "SearchResult",
+  "type": "object"
+}

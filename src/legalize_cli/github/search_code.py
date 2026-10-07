@@ -27,6 +27,15 @@ class CodeMatch(BaseModel):
     sha: str
     name: str
     html_url: Optional[str] = None
+    repository: Optional[dict] = None
+
+
+class CodeSearchResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    items: List[CodeMatch]
+    total_count: int
+    has_more: bool
 
 
 def search_code(
@@ -41,6 +50,17 @@ def search_code(
     :raises AuthError: if the client has no token attached.
     :raises SearchIncompleteError: if GitHub reports a timed-out search.
     """
+    return search_code_detailed(client, query, repo=repo, limit=limit).items
+
+
+def search_code_detailed(
+    client: GitHubClient,
+    query: str,
+    *,
+    repo: str,
+    limit: int = 100,
+) -> CodeSearchResult:
+    """Run code search while preserving count and pagination metadata."""
     if client.token_source == "none":
         raise AuthError(
             "/search/code requires a GitHub token; set GITHUB_TOKEN or pass --token"
@@ -51,6 +71,7 @@ def search_code(
     per_page = min(target, 100)
     page = 1
     items: list[dict] = []
+    reported_total = 0
 
     while len(items) < target:
         payload = client.get_json(
@@ -68,16 +89,24 @@ def search_code(
         items.extend(page_items)
 
         total_count = min(payload.get("total_count", 0), GITHUB_SEARCH_RESULT_LIMIT)
+        reported_total = total_count
         if len(items) >= total_count or len(page_items) < per_page:
             break
         page += 1
 
-    return [CodeMatch.model_validate(item) for item in items[:target]]
+    parsed = [CodeMatch.model_validate(item) for item in items[:target]]
+    return CodeSearchResult(
+        items=parsed,
+        total_count=reported_total,
+        has_more=reported_total > len(parsed),
+    )
 
 
 __all__ = [
     "CodeMatch",
+    "CodeSearchResult",
     "GITHUB_SEARCH_RESULT_LIMIT",
     "SearchIncompleteError",
     "search_code",
+    "search_code_detailed",
 ]

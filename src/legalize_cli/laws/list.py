@@ -23,7 +23,7 @@ from ..http import GitHubClient
 LAW_CATEGORIES = ("법률", "시행령", "시행규칙", "대통령령")
 
 _LAW_PATH_RE = re.compile(
-    r"^kr/(?P<name>[^/]+)/(?P<category>법률|시행령|시행규칙|대통령령)\.md$"
+    r"^kr/(?P<name>[^/]+)/(?P<category>법률|시행령|시행규칙|대통령령)(?:\([^/]+\))?\.md$"
 )
 
 

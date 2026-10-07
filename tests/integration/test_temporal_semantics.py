@@ -14,10 +14,14 @@ from legalize_cli.laws.asof import ResolvedAsOf
 from legalize_cli.laws.frontmatter import parse as parse_frontmatter
 from legalize_cli.laws.list import LawEntry
 from legalize_cli.laws.lookup import ResolvedLawFile
+from legalize_cli.services import laws as law_service
 
 
 class _Client:
     token_source = "none"
+
+    def get_json(self, path, **kwargs):
+        return []
 
     def close(self) -> None:
         pass
@@ -55,22 +59,17 @@ def test_get_and_article_cli_apply_semantic_and_warn_before_file_effective_date(
     monkeypatch,
 ) -> None:
     announced = _resolved(
-        sha="new", promulgation="2026-03-01", enforcement="2026-07-01", content="새 규정", selected_date="2026-03-01"
+        sha="b" * 40, promulgation="2026-03-01", enforcement="2026-07-01", content="새 규정", selected_date="2026-03-01"
     )
     effective = _resolved(
-        sha="old", promulgation="2025-01-01", enforcement="2025-01-01", content="이전 규정"
+        sha="a" * 40, promulgation="2025-01-01", enforcement="2025-01-01", content="이전 규정"
     )
     selections = {"공포일자": announced, "시행일자": effective}
 
     monkeypatch.setattr(asof_cmd, "make_client", lambda *_args: (_Client(), None))
     monkeypatch.setattr(article, "make_client", lambda *_args: (_Client(), None))
     monkeypatch.setattr(
-        asof_cmd,
-        "resolve_law_file_as_of",
-        lambda _client, _cache, _path, _target, semantic: selections[semantic],
-    )
-    monkeypatch.setattr(
-        article,
+        law_service,
         "resolve_law_file_as_of",
         lambda _client, _cache, _path, _target, semantic: selections[semantic],
     )

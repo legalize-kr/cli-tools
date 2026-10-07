@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "LawEntry": {
+      "additionalProperties": false,
+      "description": "A single law (path, name, category) tuple.",
+      "properties": {
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "category"
+      ],
+      "title": "LawEntry",
+      "type": "object"
+    },
+    "RepositorySnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Ref",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "ref"
+      ],
+      "title": "RepositorySnapshot",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/LawEntry"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "kind": {
+      "const": "laws.list",
+      "default": "laws.list",
+      "title": "Kind",
+      "type": "string"
+    },
+    "next_page": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Next Page"
+    },
+    "page": {
+      "title": "Page",
+      "type": "integer"
+    },
+    "page_size": {
+      "title": "Page Size",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot": {
+      "$ref": "#/$defs/RepositorySnapshot"
+    },
+    "total": {
+      "title": "Total",
+      "type": "integer"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "snapshot",
+    "total",
+    "page",
+    "page_size",
+    "next_page",
+    "items"
+  ],
+  "title": "LawListResult",
+  "type": "object"
+}

@@ -1,0 +1,162 @@
+{
+  "$defs": {
+    "PrecedentEntry": {
+      "additionalProperties": false,
+      "description": "A single precedent entry derived from the tree path.",
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "법원명": {
+          "title": "법원명",
+          "type": "string"
+        },
+        "사건번호": {
+          "title": "사건번호",
+          "type": "string"
+        },
+        "사건종류": {
+          "title": "사건종류",
+          "type": "string"
+        },
+        "판례일련번호": {
+          "title": "판례일련번호",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "사건종류",
+        "법원명",
+        "사건번호",
+        "판례일련번호"
+      ],
+      "title": "PrecedentEntry",
+      "type": "object"
+    },
+    "RepositorySnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "pattern": "^[0-9a-f]{40}$",
+          "title": "Ref",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "ref"
+      ],
+      "title": "RepositorySnapshot",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "items": {
+        "$ref": "#/$defs/PrecedentEntry"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "kind": {
+      "const": "precedents.list",
+      "default": "precedents.list",
+      "title": "Kind",
+      "type": "string"
+    },
+    "next_page": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Next Page"
+    },
+    "page": {
+      "title": "Page",
+      "type": "integer"
+    },
+    "page_size": {
+      "title": "Page Size",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot": {
+      "$ref": "#/$defs/RepositorySnapshot"
+    },
+    "total": {
+      "title": "Total",
+      "type": "integer"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "snapshot",
+    "total",
+    "page",
+    "page_size",
+    "next_page",
+    "items"
+  ],
+  "title": "PrecedentListResult",
+  "type": "object"
+}

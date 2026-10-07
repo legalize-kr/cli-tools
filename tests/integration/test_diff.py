@@ -23,6 +23,8 @@ def test_diff_2015_vs_2024(
         if "/commits" in url:
             # Return the same commits payload regardless of law path.
             return httpx.Response(200, json=commits_fixture)
+        if "/contents/" in url and request.headers.get("accept") == "application/vnd.github+json":
+            return httpx.Response(200, json=[])
         if "/contents/" in url:
             # Pick the fixture based on the ref (sha) in the query string.
             if "ca7d5c5" in url or "bbbccc" in url:
@@ -82,6 +84,8 @@ def test_cross_statute_warning_to_stderr(
         url = str(request.url)
         if "/commits" in url:
             return httpx.Response(200, json=commits_fixture)
+        if "/contents/" in url and request.headers.get("accept") == "application/vnd.github+json":
+            return httpx.Response(200, json=[])
         if "/contents/" in url:
             if "민법" in url:
                 return httpx.Response(200, content=mingbeop_2024_bytes)
@@ -124,6 +128,8 @@ def test_cross_statute_warning_suppressed(
         url = str(request.url)
         if "/commits" in url:
             return httpx.Response(200, json=commits_fixture)
+        if "/contents/" in url and request.headers.get("accept") == "application/vnd.github+json":
+            return httpx.Response(200, json=[])
         if "/contents/" in url:
             if "민법" in url:
                 return httpx.Response(200, content=mingbeop_2024_bytes)

@@ -30,6 +30,41 @@ class NotFoundError(LegalizeError):
     exit_code: int = 4
 
 
+class AmbiguousMatchError(NotFoundError):
+    """A user-facing name or case number resolves to multiple public paths."""
+
+    def __init__(self, message: str, candidates: list[str]) -> None:
+        super().__init__(message)
+        self.candidates = candidates
+        self.candidate_total = len(candidates)
+
+
+class InputValidationError(LegalizeError):
+    """A service request violates the public MCP input contract."""
+
+    exit_code: int = 2
+
+
+class VersionNotFoundError(NotFoundError):
+    """No law revision matches a requested date semantic."""
+
+
+class ArticleNotFoundError(NotFoundError):
+    """The selected law revision does not contain the requested article."""
+
+
+class RequestBudgetExceededError(LegalizeError):
+    """A single MCP call exceeded its request count or cooperative deadline."""
+
+
+class ResponseTooLargeError(LegalizeError):
+    """A complete response cannot be returned inside the MCP size policy."""
+
+    def __init__(self, message: str, *, source: dict | None = None) -> None:
+        super().__init__(message)
+        self.source = source
+
+
 class ForcePushError(LegalizeError):
     """Cache coherence broken by an upstream force-push (pipeline rebuild)."""
 
@@ -69,6 +104,12 @@ __all__ = [
     "LegalizeError",
     "RateLimitError",
     "NotFoundError",
+    "AmbiguousMatchError",
+    "InputValidationError",
+    "VersionNotFoundError",
+    "ArticleNotFoundError",
+    "RequestBudgetExceededError",
+    "ResponseTooLargeError",
     "ForcePushError",
     "AmbiguousHeadingLevelError",
     "AuthError",

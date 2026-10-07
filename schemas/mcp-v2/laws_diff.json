@@ -1,0 +1,407 @@
+{
+  "$defs": {
+    "ArticleChangeResult": {
+      "additionalProperties": false,
+      "properties": {
+        "article_no": {
+          "$ref": "#/$defs/ArticleNo"
+        },
+        "from_article_no": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArticleNo"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "hunk": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hunk"
+        },
+        "similarity": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Similarity"
+        },
+        "status": {
+          "enum": [
+            "modified",
+            "added",
+            "removed",
+            "renamed",
+            "whitespace-only",
+            "unchanged"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "article_no",
+        "status"
+      ],
+      "title": "ArticleChangeResult",
+      "type": "object"
+    },
+    "ArticleNo": {
+      "additionalProperties": false,
+      "description": "Structured article number.\n\nSerializes with Korean keys: ``{조, 의, 항, 호}`` — see ``model_config``.",
+      "properties": {
+        "의": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "의"
+        },
+        "조": {
+          "title": "조",
+          "type": "string"
+        },
+        "항": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "항"
+        },
+        "호": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "호"
+        }
+      },
+      "required": [
+        "조"
+      ],
+      "title": "ArticleNo",
+      "type": "object"
+    },
+    "LawDiffVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/SourceReference"
+        },
+        "version": {
+          "$ref": "#/$defs/LawVersion"
+        }
+      },
+      "required": [
+        "version",
+        "source"
+      ],
+      "title": "LawDiffVersion",
+      "type": "object"
+    },
+    "LawVersion": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date_scope": {
+          "const": "file",
+          "default": "file",
+          "title": "Effective Date Scope",
+          "type": "string"
+        },
+        "enforcement_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Enforcement Date"
+        },
+        "law_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Law Id"
+        },
+        "law_mst": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Law Mst"
+        },
+        "promulgation_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Promulgation Date"
+        },
+        "requested_date": {
+          "format": "date",
+          "title": "Requested Date",
+          "type": "string"
+        },
+        "resolved_commit_date": {
+          "format": "date",
+          "title": "Resolved Commit Date",
+          "type": "string"
+        },
+        "resolved_version_date": {
+          "format": "date",
+          "title": "Resolved Version Date",
+          "type": "string"
+        },
+        "semantic": {
+          "enum": [
+            "공포일자",
+            "시행일자"
+          ],
+          "title": "Semantic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "semantic",
+        "requested_date",
+        "resolved_version_date",
+        "resolved_commit_date"
+      ],
+      "title": "LawVersion",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "dataset": {
+          "enum": [
+            "laws",
+            "precedents",
+            "admrules",
+            "ordinances"
+          ],
+          "title": "Dataset",
+          "type": "string"
+        },
+        "github_url": {
+          "title": "Github Url",
+          "type": "string"
+        },
+        "original_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Url"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{40}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref"
+        },
+        "ref_type": {
+          "enum": [
+            "commit",
+            "unknown"
+          ],
+          "title": "Ref Type",
+          "type": "string"
+        },
+        "repository": {
+          "title": "Repository",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataset",
+        "repository",
+        "path",
+        "ref_type",
+        "github_url"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "Warning": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "dataset": {
+          "anyOf": [
+            {
+              "enum": [
+                "laws",
+                "precedents",
+                "admrules",
+                "ordinances"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dataset"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "Warning",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "a": {
+      "$ref": "#/$defs/LawDiffVersion"
+    },
+    "b": {
+      "$ref": "#/$defs/LawDiffVersion"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "changes": {
+      "items": {
+        "$ref": "#/$defs/ArticleChangeResult"
+      },
+      "title": "Changes",
+      "type": "array"
+    },
+    "kind": {
+      "const": "laws.diff",
+      "default": "laws.diff",
+      "title": "Kind",
+      "type": "string"
+    },
+    "law": {
+      "title": "Law",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "article",
+        "unified"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "2.0",
+      "default": "2.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Text"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/Warning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "warnings",
+    "law",
+    "category",
+    "a",
+    "b",
+    "mode"
+  ],
+  "title": "LawDiffResult",
+  "type": "object"
+}

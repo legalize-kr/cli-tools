@@ -26,6 +26,7 @@ from .cache import DiskCache
 from .config import GITHUB_API_ROOT, USER_AGENT
 from .rate_limit import RateLimit
 from .util.errors import NotFoundError, RateLimitError
+from .services.limits import RequestBudget
 
 #: Default Accept header for REST JSON responses.
 _ACCEPT_JSON = "application/vnd.github+json"
@@ -47,6 +48,7 @@ class GitHubClient:
         transport: Optional[httpx.BaseTransport] = None,
         timeout: float = 30.0,
         cache: Optional[DiskCache] = None,
+        budget: Optional[RequestBudget] = None,
     ) -> None:
         if token is None and token_source == "none":
             token, token_source = resolve_token(None)
@@ -60,6 +62,8 @@ class GitHubClient:
             headers=self._default_headers(),
         )
         self._cache: Optional[DiskCache] = cache
+        self._budget = budget
+        self._timeout = timeout
         #: Most recent rate-limit snapshot, or ``None`` until the first call.
         self.last_rate_limit: Optional[RateLimit] = None
 
@@ -166,7 +170,15 @@ class GitHubClient:
         if extra_headers:
             headers.update(extra_headers)
 
-        response = self._client.request(method, url, params=params, headers=headers)
+        timeout = self._timeout
+        if self._budget is not None:
+            self._budget.consume_request()
+            timeout = min(timeout, max(self._budget.remaining_seconds, 0.001))
+        response = self._client.request(
+            method, url, params=params, headers=headers, timeout=timeout
+        )
+        if self._budget is not None:
+            self._budget.checkpoint()
         self.last_rate_limit = RateLimit.from_headers(response.headers)
 
         if response.status_code == 304:

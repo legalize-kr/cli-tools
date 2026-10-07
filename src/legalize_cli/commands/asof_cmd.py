@@ -6,23 +6,26 @@ Named with the ``_cmd`` suffix per plan §3 to avoid shadowing
 
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 from typing import Optional, cast
 
 import typer
 
+from ..contracts.requests import LawGetRequest
 from ..laws.asof import Semantic
-from ..laws.frontmatter import parse as parse_frontmatter
 from ..laws.list import enumerate_laws
 from ..laws.lookup import resolve_law_file_as_of
+from ..services.context import ServiceContext
+from ..services.dates import parse_date_or_today
+from ..services.laws import get_law
 from ..util.cli_common import (
     build_global_opts,
     emit_json,
     handle_domain_error,
     make_client,
 )
-from ..util.errors import LegalizeError, NotFoundError
+from ..util.errors import LegalizeError
 from .list_laws import laws_app
 
 #: Limit above which a heavy scan without a token must be confirmed.
@@ -128,26 +131,23 @@ def get_law_cmd(
         raise typer.BadParameter("--semantic must be 공포일자 or 시행일자")
 
     target = _parse_date(the_date)
-    path = f"kr/{law_name}/{category}.md"
-
     opts = build_global_opts(token, no_cache, cache_dir, offline, json_output)
     client, cache = make_client(opts)
 
     try:
-        resolved = resolve_law_file_as_of(
-            client, cache, path, target, cast(Semantic, semantic)
+        loaded = get_law(
+            ServiceContext(client, cache),
+            LawGetRequest(law_name=law_name, category=category, date=target.isoformat(), semantic=cast(Semantic, semantic)),
         )
-        if resolved is None:
-            raise NotFoundError(
-                f"no {semantic} revision at or before {target.isoformat()} for {path}"
-            )
     except LegalizeError as exc:
         raise handle_domain_error(exc) from exc
     finally:
         client.close()
 
-    text = resolved.raw.decode("utf-8", errors="replace")
-    fm, md_body = parse_frontmatter(text)
+    result = loaded.result
+    text = loaded.raw_text
+    fm = result.frontmatter
+    md_body = result.body
     warning = _file_scope_warning(semantic, target, fm.enforcement_date)
 
     if json_output:
@@ -156,10 +156,10 @@ def get_law_cmd(
             "category": category,
             "semantic": semantic,
             "requested_date": target.isoformat(),
-            "resolved_version_date": resolved.resolution.semantic_date.isoformat(),
-            "resolved_commit_date": resolved.resolution.commit.author_date.date().isoformat(),
-            "resolved_commit_sha": resolved.resolution.commit.sha,
-            "path": path,
+            "resolved_version_date": result.version.resolved_version_date.isoformat(),
+            "resolved_commit_date": result.version.resolved_commit_date.isoformat(),
+            "resolved_commit_sha": result.source.ref,
+            "path": result.source.path,
             "frontmatter": fm.model_dump(by_alias=True, exclude_none=True),
             "file_effective_date_only": True,
             "body": md_body,
@@ -178,11 +178,9 @@ def get_law_cmd(
 
 
 def _parse_date(raw: Optional[str]) -> date:
-    if raw is None:
-        return datetime.now(timezone.utc).astimezone().date()
     try:
-        return date.fromisoformat(raw)
-    except ValueError as exc:
+        return parse_date_or_today(raw)
+    except LegalizeError as exc:
         raise typer.BadParameter(f"--date must be YYYY-MM-DD ({exc})") from exc
 
 

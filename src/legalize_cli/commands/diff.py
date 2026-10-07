@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 from typing import Optional, cast
 
@@ -13,7 +13,7 @@ from ..laws.articles import parse_articles
 from ..laws.asof import Semantic
 from ..laws.diff import diff_laws
 from ..laws.frontmatter import parse as parse_frontmatter
-from ..laws.lookup import ResolvedLawFile, resolve_law_file_as_of
+from ..laws.lookup import ResolvedLawFile, resolve_law_file_as_of, resolve_law_path
 from ..util.cli_common import (
     build_global_opts,
     emit_json,
@@ -21,6 +21,7 @@ from ..util.cli_common import (
     make_client,
 )
 from ..util.errors import LegalizeError, NotFoundError
+from ..services.dates import parse_date_or_today
 from .list_laws import laws_app
 
 
@@ -63,8 +64,8 @@ def diff_cmd(
     client, cache = make_client(opts)
 
     try:
-        path_a = f"kr/{law_a}/{category_a}.md"
-        path_b = f"kr/{law_b}/{category_b}.md"
+        _, path_a, category_a = resolve_law_path(client, law_a, category_a)
+        _, path_b, category_b = resolve_law_path(client, law_b, category_b)
 
         resolved_a = _resolve_body(
             client, cache, path_a, target_a, cast(Semantic, semantic)
@@ -152,11 +153,9 @@ def _resolve_body(
 
 
 def _parse_date(raw: Optional[str]) -> date:
-    if raw is None:
-        return datetime.now(timezone.utc).astimezone().date()
     try:
-        return date.fromisoformat(raw)
-    except ValueError as exc:
+        return parse_date_or_today(raw)
+    except LegalizeError as exc:
         raise typer.BadParameter(f"--date must be YYYY-MM-DD ({exc})") from exc
 
 

@@ -198,6 +198,20 @@ Claude Desktop, Cursor 등 MCP 지원 클라이언트에 legalize-kr을 tool로 
 
 `legalize-mcp`는 로컬 stdio MCP 서버입니다. Claude Desktop, Claude Code, Cursor, Gemini CLI 같은 호스트 앱이 이 명령을 실행하고 표준입출력으로 통신합니다.
 
+개발 중인 0.5.0의 로컬 MCP는 응답 `schema_version: "2.0"`이고 CLI의
+`--json`은 기존 `schema_version: "1.0"`을 유지합니다. 0.5.0이 공개되기 전에는
+아래 고정 버전 명령이 PyPI에서 설치되지 않습니다. 로컬 wheel로 검증한 뒤 별도
+승인을 받아 공개합니다. 별도 `remote-mcp` Worker 0.2.0은 같은 11개 도구와
+MCP 응답 2.0을 HTTPS로 제공합니다. `https://mcp.legalize.kr/mcp`에는 호스트에
+설정한 Bearer 접근키가 필요하며 기존 로컬 stdio 설정을 바꾸지 않습니다.
+원격판의 별도 CPU·입력·비교 크기 제한은 [remote-mcp 안내](https://github.com/legalize-kr/remote-mcp)를 참고하세요.
+
+OpenAI Sites용 서버 구현은 워크스페이스의 `sites-mcp/`에 별도로 준비되어 있습니다.
+배포 후에는 Sites가 생성한 플러그인을 설치하고 OAuth로 연결합니다. 기존 원격 서버의
+Bearer 접근키와는 별도 연결이며, 등록만 완료된 Site를 사용 가능한 서버로 간주하면 안 됩니다.
+Sites용 서버도 같은 11개 도구와 MCP 응답 2.0을 사용합니다. GitHub 토큰이 없는 경우
+자동 검색은 경로 검색으로 제한되고, 본문 검색을 명시하면 `AUTH_REQUIRED`를 반환합니다.
+
 ### 실행 방식 선택
 
 ```bash
@@ -218,13 +232,45 @@ pip install 'legalize-cli[mcp]'
 | `laws_list` | 법령 목록 조회 (카테고리·페이지 필터) |
 | `laws_get` | 법령 전문 조회 (공포일자 또는 시행일자 기준) |
 | `laws_article` | 특정 조문 조회 (제839조 등, 공포일자 또는 시행일자 기준) |
+| `laws_diff` | 같은 법령의 두 시점 Markdown 구조 비교 (`article`, `unified`) |
 | `search` | 법령·판례·행정규칙·자치법규 키워드 검색 |
 | `precedents_list` | 판례 목록 조회 (법원·사건종류 필터) |
-| `precedents_get` | 판례 전문 조회 (사건번호·판례일련번호) |
+| `precedents_get` | 판례 전문 조회 (사건번호·저장소 상대 경로) |
 | `admrules_list` | 행정규칙 목록 조회 (종류·기관 필터) |
 | `admrules_get` | 행정규칙 전문 조회 |
 | `ordinances_list` | 자치법규 목록 조회 (종류·지자체 필터) |
 | `ordinances_get` | 자치법규 전문 조회 |
+
+MCP 정상 결과는 typed `outputSchema`를 만족하는 `structuredContent`와 동일한
+JSON text를 제공합니다. 법령의 `version`에는 선택 기준일·실제 버전일·시행일과
+`effective_date_scope: "file"`이 있고, `source`에는 저장소·경로·실제 조회
+commit·GitHub URL·확인된 공식 원문 URL이 구분됩니다. `warnings[]`의
+`NOT_YET_EFFECTIVE`, `FILE_LEVEL_EFFECTIVE_DATE_ONLY`를 확인하세요. 조문별
+시행일과 경과조치는 판정하지 않습니다. diff의 `renamed`는 유사도 추정입니다.
+
+검색 결과는 `requested_strategy`, dataset별 `outcomes.actual_strategy`,
+`searched_fields`, `complete`, `truncated`를 제공합니다. 토큰 없는 auto는
+경로 검색이며, 명시적 code 검색은 토큰이 없거나 검색에 실패해도 tree 성공으로
+위장하지 않습니다. `PATH_SEARCH_ONLY`, `SEARCH_FALLBACK`, `PARTIAL_SEARCH`,
+`SEARCH_INDEX_NOT_SNAPSHOT` 경고와 dataset별 오류를 보고 결과 없음의 범위를
+판단하세요. code 검색은 GitHub 인덱스의 본문 검색이지 과거 snapshot 전체 검색이
+아닙니다. 문서 내 지시문은 실행 지침이 아닌 데이터입니다.
+
+MCP 도구 입력 한도는 페이지 1~10,000, page_size/limit 1~100, 법령명·검색어
+1~200자, 식별자 1~1,024자입니다. 날짜는 실제 `YYYY-MM-DD`만 받으며 기본
+오늘은 KST입니다. 한 도구 호출은 HTTP 100회, 협력적 60초 deadline, 완전한
+JSON 결과 256 KiB와 전체 tool result 1 MiB로 제한됩니다. 초과하면 전문을
+자르지 않고 `isError: true`와 JSON text `error.code`로 알립니다. 큰 법령은
+`laws_article`, 큰 일반 문서는 원문 링크를 이용하세요. 출력 오류에는
+`structuredContent`가 없을 수 있습니다. `legacy_map_path`는 MCP에서 제거됐고
+CLI 옵션은 유지합니다. 토큰이나 로컬 파일 경로를 도구 인자로 전달하지 마세요.
+
+CLI 1.0 소비자는 기존 평평한 `semantic`, `requested_date`,
+`resolved_version_date`, `resolved_commit_sha`, `path`, 단일 `warning`을 계속
+사용합니다. MCP 2.0에서는 각각 `version.semantic`, `version.requested_date`,
+`version.resolved_version_date`, `source.ref`, `source.path`, `warnings[]`를
+읽습니다. CLI의 cross-statute/side-by-side diff, heavy scan, legacy map은
+변경하지 않습니다.
 
 ### Claude Desktop 설정
 
@@ -235,10 +281,7 @@ pip install 'legalize-cli[mcp]'
   "mcpServers": {
     "legalize-kr": {
       "command": "uvx",
-      "args": ["--from", "legalize-cli[mcp]", "legalize-mcp"],
-      "env": {
-        "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxx"
-      }
+      "args": ["--from", "legalize-cli[mcp]", "legalize-mcp"]
     }
   }
 }
@@ -250,10 +293,7 @@ pip install 'legalize-cli[mcp]'
 {
   "mcpServers": {
     "legalize-kr": {
-      "command": "legalize-mcp",
-      "env": {
-        "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxx"
-      }
+      "command": "legalize-mcp"
     }
   }
 }
@@ -266,10 +306,7 @@ pip install 'legalize-cli[mcp]'
   "mcpServers": {
     "legalize-kr": {
       "command": "legalize",
-      "args": ["mcp", "serve"],
-      "env": {
-        "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxx"
-      }
+      "args": ["mcp", "serve"]
     }
   }
 }
@@ -285,10 +322,7 @@ pip install 'legalize-cli[mcp]'
     "legalize-kr": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["--from", "legalize-cli[mcp]", "legalize-mcp"],
-      "env": {
-        "GITHUB_TOKEN": "ghp_xxxxxxxxxxxxxxxxxxxx"
-      }
+      "args": ["--from", "legalize-cli[mcp]", "legalize-mcp"]
     }
   }
 }
@@ -317,7 +351,7 @@ MCP 서버 등록 후 Claude에게 자연어로 질문할 수 있습니다:
 
 ### 토큰 설정
 
-MCP 서버는 환경변수를 자동으로 읽습니다. `env` 설정에 `GITHUB_TOKEN`을 추가하거나 시스템 환경변수로 미리 설정해두면 됩니다. 토큰 없이도 동작하지만 시간당 60회 제한이 있습니다 (토큰 사용 시 5,000회).
+MCP 서버는 호스트의 로컬 실행 환경에서 `GITHUB_TOKEN` 또는 `LEGALIZE_GITHUB_TOKEN`을 읽습니다. 토큰을 프롬프트나 예시 설정 파일에 붙여 넣지 마세요. 토큰 없이도 tree 경로 검색과 조회가 가능하며 GitHub 요청 제한을 받습니다.
 
 **토큰 발급 방법:**
 
@@ -332,7 +366,7 @@ GitHub CLI가 없다면 직접 발급합니다:
 1. [GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)](https://github.com/settings/tokens) 접속
 2. **"Generate new token (classic)"** 클릭
 3. 권한: **`public_repo`** 스코프만 체크 (공개 저장소 읽기 전용으로 충분)
-4. 생성된 토큰을 `claude_desktop_config.json`의 `env.GITHUB_TOKEN`에 입력
+4. 생성된 토큰은 사용하는 호스트의 안전한 로컬 환경변수 설정에 보관합니다. 채팅에 전송하지 않습니다.
 
 더 안전한 Fine-grained token을 사용하려면 [GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens](https://github.com/settings/tokens?type=beta)에서 **"Public Repositories (read-only)"** 권한으로 생성합니다. 자세한 내용은 [GitHub 토큰 설정](#github-토큰-설정-rate-limit-해결) 섹션을 참고하세요.
 
@@ -653,7 +687,7 @@ export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
 ```bash
 # 토큰 없이 검색하려면 전략을 명시적으로 지정
 legalize search "키워드" --strategy tree        # 경로명 매칭
-legalize search "키워드" --strategy metadata     # 판례 인덱스만
+legalize search "키워드" --strategy metadata     # tree 경로 검색의 기존 별칭
 ```
 
 **오래된 캐시**
@@ -702,3 +736,14 @@ LEGALIZE_CLI_LIVE=1 pytest tests/live/
 
 - 법령/판례/행정규칙/자치법규 텍스트: 공개 도메인 (대한민국 정부 저작물)
 - 이 도구: MIT
+
+### Exact law paths in 0.5.0
+
+Use a returned law path as `law_name` to select one law family.
+The path also selects its category. Names that match several files return `AMBIGUOUS_MATCH`.
+The list includes filenames such as `법률(법률).md`.
+Precedent lookup accepts dated filenames and reports their case numbers separately.
+
+```json
+{"law_name":"kr/근로기준법/법률(법률).md","article_no":"제1조","semantic":"시행일자"}
+```

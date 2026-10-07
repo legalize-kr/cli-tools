@@ -193,17 +193,15 @@ def _extract_annotations(content_body: str) -> List[str]:
 def _parent_structure(lines: List[str], start: int, article_level: int) -> List[str]:
     """Walk backwards accumulating shallower-level headings (top-most first)."""
     chain: List[Tuple[int, str]] = []
-    seen_depths: set[int] = set()
+    boundary = article_level
     for i in range(start - 1, -1, -1):
         m = _ANY_HEAD_RE.match(lines[i])
         if not m:
             continue
         depth = len(m.group("hashes"))
-        if depth >= article_level:
+        if depth >= boundary:
             continue
-        if depth in seen_depths:
-            continue
-        seen_depths.add(depth)
+        boundary = depth
         chain.append((depth, m.group("text").strip()))
     # Sort by depth ascending so top-most (편) comes first.
     chain.sort(key=lambda pair: pair[0])

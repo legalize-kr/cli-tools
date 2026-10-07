@@ -16,7 +16,7 @@ from .config import DEFAULT_BRANCH, OWNER
 from .github.contents import get_file_raw
 from .github.trees import get_tree
 from .http import GitHubClient
-from .util.errors import NotFoundError
+from .util.errors import AmbiguousMatchError, NotFoundError
 
 BODY_FILENAME = "본문.md"
 
@@ -111,7 +111,7 @@ def fetch_document_by_name_or_path(
 ) -> Tuple[str, bytes]:
     """Fetch a document by repository path or exact document name."""
     if "/" in identifier and identifier.endswith(".md"):
-        body = get_file_raw(client, owner, repo, identifier)
+        body = get_file_raw(client, owner, repo, identifier, ref=ref)
         return identifier, body
 
     entries = enumerate_documents(client, cache, owner=owner, repo=repo, ref=ref)
@@ -129,15 +129,16 @@ def fetch_document_by_name_or_path(
 
     if len(hits) == 1:
         path = hits[0].path
-        return path, get_file_raw(client, owner, repo, path)
+        return path, get_file_raw(client, owner, repo, path, ref=ref)
     if not hits:
         raise NotFoundError(f"no document matches {identifier!r} in {repo}")
 
     candidates = ", ".join(entry.path for entry in hits[:10])
     suffix = "" if len(hits) <= 10 else f", ... +{len(hits) - 10} more"
-    raise NotFoundError(
+    raise AmbiguousMatchError(
         f"ambiguous document name {identifier!r} in {repo}; "
-        f"pass the full path instead: {candidates}{suffix}"
+        f"pass the full path instead: {candidates}{suffix}",
+        [entry.path for entry in hits],
     )
 
 

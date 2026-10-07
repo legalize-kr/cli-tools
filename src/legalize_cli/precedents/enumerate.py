@@ -45,7 +45,7 @@ def enumerate_precedents(
                 path=entry.path,
                 사건종류=m.group("type"),
                 법원명=m.group("court"),
-                사건번호=m.group("case"),
+                사건번호=re.sub(r"^[^_]+_\d{4}-\d{2}-\d{2}_", "", m.group("case")),
                 판례일련번호=entry.path,
             )
         )

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.5.0] - 2026-10-07
+
+### Breaking Changes (local MCP only)
+
+- MCP 응답을 2.0 typed 구조(`version`, `source`, `warnings`, 검색 outcomes)로
+  변경하고 오류를 `isError: true`로 구분합니다. CLI JSON 1.0은 유지합니다.
+- MCP `precedents_get.legacy_map_path`를 제거했습니다. 명시적 code 검색은
+  자동 tree 폴백을 하지 않습니다. MCP 입력·호출·응답 제한을 적용합니다.
+
+### Added
+
+- `laws_diff` MCP 도구와 11개 도구의 output schema, snapshot 출처,
+  검색 부분 실패·경로 검색 범위, KST 기본 날짜를 추가했습니다.
+- Python MCP SDK 2.2 이상, 3 미만을 사용합니다. 로컬 stdio 진입점은 유지합니다.
+
+### Fixed
+
+- Read disambiguated law filenames and require a choice for duplicate law names.
+- Accept returned law paths and dated precedent filenames.
+- Exclude sections from an earlier chapter in article parent headings.
+
 ## [0.4.0] — 2026-09-05
 
 ### Breaking Changes

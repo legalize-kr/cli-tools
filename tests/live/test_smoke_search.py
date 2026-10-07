@@ -12,11 +12,12 @@ from legalize_cli.__main__ import app
 
 
 @pytest.mark.live
-def test_live_search_precedent_metadata() -> None:
+def test_live_search_precedent_paths() -> None:
     runner = CliRunner()
-    result = runner.invoke(app, ["search", "소유권이전", "--in", "precedents", "--json"])
+    result = runner.invoke(app, ["search", "대법원", "--in", "precedents", "--strategy", "tree", "--json"])
     assert result.exit_code == 0
     data = json.loads(result.output)
+    assert data["strategy_used"] == "tree"
     assert len(data["items"]) >= 1
 
 

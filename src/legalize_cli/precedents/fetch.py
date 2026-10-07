@@ -6,12 +6,11 @@ import json
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
 
-from ..SEP import SEP
 from ..config import DEFAULT_BRANCH, OWNER, PRECEDENTS_REPO
 from ..github.contents import get_file_raw
 from ..github.trees import get_tree
 from ..http import GitHubClient
-from ..util.errors import NotFoundError
+from ..util.errors import AmbiguousMatchError, NotFoundError
 
 
 def _load_legacy_map(source: Union[str, Path, List[dict]]) -> List[dict]:
@@ -53,7 +52,7 @@ def fetch_by_id_or_path(
     :raises NotFoundError: no matching entry was found, or >1 matches (disambiguation).
     """
     if "/" in arg and arg.endswith(".md"):
-        body = get_file_raw(client, owner, repo, arg)
+        body = get_file_raw(client, owner, repo, arg, ref=ref)
         return arg, body
 
     entries = get_tree(client, owner, repo, ref)
@@ -61,17 +60,18 @@ def fetch_by_id_or_path(
     # (a) New composite grammar: filename ends with {SEP}{caseno}.md
     new_hits = [
         e for e in entries
-        if e.type == "blob" and e.path.endswith(f"{SEP}{arg}.md")
+        if e.type == "blob" and e.path.endswith(f"_{arg}.md")
     ]
     if len(new_hits) == 1:
         path = new_hits[0].path
-        body = get_file_raw(client, owner, repo, path)
+        body = get_file_raw(client, owner, repo, path, ref=ref)
         return path, body
     if len(new_hits) > 1:
         candidates = ", ".join(e.path for e in new_hits)
-        raise NotFoundError(
+        raise AmbiguousMatchError(
             f"ambiguous 사건번호 {arg!r} ({len(new_hits)} matches); "
-            f"pass the full path instead: {candidates}"
+            f"pass the full path instead: {candidates}",
+            [e.path for e in new_hits],
         )
 
     # (b) Legacy: exact filename /{caseno}.md
@@ -81,13 +81,14 @@ def fetch_by_id_or_path(
     ]
     if len(legacy_hits) == 1:
         path = legacy_hits[0].path
-        body = get_file_raw(client, owner, repo, path)
+        body = get_file_raw(client, owner, repo, path, ref=ref)
         return path, body
     if len(legacy_hits) > 1:
         candidates = ", ".join(e.path for e in legacy_hits)
-        raise NotFoundError(
+        raise AmbiguousMatchError(
             f"ambiguous 사건번호 {arg!r} ({len(legacy_hits)} matches); "
-            f"pass the full path instead: {candidates}"
+            f"pass the full path instead: {candidates}",
+            [e.path for e in legacy_hits],
         )
 
     # (c) Legacy-map fallback
@@ -95,7 +96,7 @@ def fetch_by_id_or_path(
         mapping = _load_legacy_map(legacy_map)
         new_path = _lookup_in_legacy_map(mapping, arg)
         if new_path:
-            body = get_file_raw(client, owner, repo, new_path)
+            body = get_file_raw(client, owner, repo, new_path, ref=ref)
             return new_path, body
 
     raise NotFoundError(f"no precedent matches {arg!r}")
