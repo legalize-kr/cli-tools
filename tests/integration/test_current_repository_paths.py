@@ -73,3 +73,15 @@ def test_ambiguous_law_requires_selection_over_mcp():
             assert error["code"] == "AMBIGUOUS_MATCH"
             assert error["candidates"] == sorted(paths)
     anyio.run(run)
+
+
+def test_cli_full_path_reports_selected_category(monkeypatch):
+    path = "kr/테스트법/시행령(대통령령).md"
+    install_client_factory(monkeypatch, lambda *_args: (client([path]), None))
+    for command in (["get", path], ["article", path, "2"]):
+        result = CliRunner().invoke(app, ["laws", *command, "--date", "2026-02-01", "--json"])
+        assert result.exit_code == 0, result.output
+        payload = json.loads(result.output)
+        assert payload["law"] == "테스트법"
+        assert payload["category"] == "시행령"
+        assert payload["path"] == path

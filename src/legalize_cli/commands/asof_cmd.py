@@ -152,8 +152,8 @@ def get_law_cmd(
 
     if json_output:
         payload = {
-            "law": law_name,
-            "category": category,
+            "law": result.law,
+            "category": result.category,
             "semantic": semantic,
             "requested_date": target.isoformat(),
             "resolved_version_date": result.version.resolved_version_date.isoformat(),

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1] - 2026-10-07
+
+### Fixed
+
+- Report the selected law name and category in CLI JSON when a full path selects a different category.
+- Keep MCP schema 2.0 and CLI schema 1.0 unchanged.
+
 ## [0.5.0] - 2026-10-07
 
 ### Breaking Changes (local MCP only)
