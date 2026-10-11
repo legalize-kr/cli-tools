@@ -169,3 +169,19 @@ def test_enumerate_handles_truncated_root_tree() -> None:
         "특허/대법원/대법원_2026-01-15_2022후10401.md"
     ]
     assert entries[0].사건종류 == "특허"
+
+
+def test_lower_court_filter_uses_filename_court_and_preserves_case_number() -> None:
+    path = "가사/하급심/서울중앙지방법원_2023-01-16_2022가단5122663_병합.md"
+    missing_date_path = "민사/하급심/미상법원_0000-00-00_12345.md"
+    client = _client({"tree": [{"path": p, "type": "blob", "sha": "a" * 40} for p in [path, missing_date_path]]})
+    try:
+        entries = enumerate_precedents(client)
+    finally:
+        client.close()
+    total, items, _ = list_precedents(entries, court="서울중앙지방법원")
+    assert total == 1
+    assert items[0].사건번호 == "2022가단5122663_병합"
+    assert items[0].path == path
+    assert list_precedents(entries, court="미상법원")[0] == 1
+    assert list_precedents(entries, court="하급심")[0] == 0

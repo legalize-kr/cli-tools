@@ -11,6 +11,7 @@ from __future__ import annotations
 import regex as re
 from typing import List, Optional
 
+from ..SEP import SEP
 from ..cache import DiskCache
 from ..config import DEFAULT_BRANCH, OWNER, PRECEDENTS_REPO
 from ..github.trees import get_tree
@@ -40,12 +41,16 @@ def enumerate_precedents(
         m = _PRECEDENT_PATH_RE.match(entry.path)
         if not m:
             continue
+        court, case_number = m.group("court"), m.group("case")
+        slots = case_number.split(SEP, 2)
+        if len(slots) == 3 and re.fullmatch(r"\d{4}-\d{2}-\d{2}", slots[1]):
+            court, case_number = slots[0], slots[2]
         result.append(
             PrecedentEntry(
                 path=entry.path,
                 사건종류=m.group("type"),
-                법원명=m.group("court"),
-                사건번호=re.sub(r"^[^_]+_\d{4}-\d{2}-\d{2}_", "", m.group("case")),
+                법원명=court,
+                사건번호=case_number,
                 판례일련번호=entry.path,
             )
         )

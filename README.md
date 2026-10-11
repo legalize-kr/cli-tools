@@ -438,7 +438,7 @@ article 모드 상태값: `modified | added | removed | renamed | whitespace-onl
 ### `precedents list` — 판례 목록 조회
 
 ```bash
-legalize precedents list [--court 대법원|하급심] [--type 민사|형사|가사|...] [--page N] [--page-size M] [--json]
+legalize precedents list [--court 대법원|서울중앙지방법원|...] [--type 민사|형사|가사|...] [--page N] [--page-size M] [--json]
 ```
 
 ### `precedents get` — 판례 전문 조회
