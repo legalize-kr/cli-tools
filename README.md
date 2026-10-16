@@ -741,6 +741,8 @@ LEGALIZE_CLI_LIVE=1 pytest tests/live/
 Use a returned law path as `law_name` to select one law family.
 The path also selects its category. Names that match several files return `AMBIGUOUS_MATCH`.
 The list includes filenames such as `법률(법률).md`.
+Version 0.5.3 also accepts full titles such as `주택도시기금법 시행령` and `주택도시기금법시행규칙`.
+The title suffix selects the category for get, article, and diff. Earlier packages require a separate base name and category.
 Precedent lookup accepts dated filenames and reports their case numbers separately.
 
 ```json

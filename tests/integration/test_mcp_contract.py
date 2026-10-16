@@ -95,3 +95,39 @@ def test_law_article_diff_and_error_over_actual_client(monkeypatch: pytest.Monke
             assert reversed_dates.is_error
             assert json.loads(reversed_dates.content[0].text)["error"]["code"] == "INVALID_INPUT"
     anyio.run(run)
+
+
+@pytest.mark.parametrize("category", ["시행령", "시행규칙"])
+@pytest.mark.parametrize("separator", [" ", ""])
+def test_full_law_title_over_actual_client(monkeypatch, category, separator) -> None:
+    selected_path = f"kr/주택도시기금법/{category}.md"
+
+    class TitleClient(DummyClient):
+        def get_json(self, path, **kwargs):
+            from urllib.parse import unquote
+            assert unquote(path).endswith("/contents/kr/주택도시기금법")
+            return [{"type": "file", "path": selected_path}]
+
+    selected = _resolved(SHA_NEW, "2020-01-01", "2020-01-01", "규정")
+
+    def resolve(_client, _cache, path, _target, _semantic):
+        assert path == selected_path
+        return selected
+
+    monkeypatch.setattr(law_service, "resolve_law_file_as_of", resolve)
+
+    async def run():
+        async with Client(build_server(lambda: ServiceContext(TitleClient(), None))) as client:
+            for name, extra in [
+                ("laws_get", {"category": category, "date": "2026-10-16", "semantic": "시행일자"}),
+                ("laws_article", {"article_no": "1"}),
+                ("laws_diff", {"date_a": "2020-01-01", "date_b": "2024-01-01"}),
+            ]:
+                result = await client.call_tool(name, {"law_name": f"주택도시기금법{separator}{category}", **extra})
+                assert not result.is_error
+                data = result.structured_content
+                assert data["law"] == "주택도시기금법"
+                assert data["category"] == category
+                sources = [data["a"]["source"], data["b"]["source"]] if name == "laws_diff" else [data["source"]]
+                assert all(source["path"] == selected_path for source in sources)
+    anyio.run(run)

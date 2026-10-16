@@ -94,6 +94,8 @@ class LawGetRequest(RequestModel):
     def use_path_category(self):
         if "/" in self.law_name:
             self.category = self.law_name.rsplit("/", 1)[1].split("(", 1)[0].removesuffix(".md")
+        elif match := re.fullmatch(r"(.+?)\s*(시행령|시행규칙)", self.law_name):
+            self.law_name, self.category = match[1].strip(), match[2]
         return self
 
     @field_validator("date")
@@ -129,6 +131,8 @@ class LawDiffRequest(RequestModel):
     def use_path_category(self):
         if "/" in self.law_name:
             self.category = self.law_name.rsplit("/", 1)[1].split("(", 1)[0].removesuffix(".md")
+        elif match := re.fullmatch(r"(.+?)\s*(시행령|시행규칙)", self.law_name):
+            self.law_name, self.category = match[1].strip(), match[2]
         return self
 
     @field_validator("date_a", "date_b")
