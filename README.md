@@ -198,17 +198,17 @@ Claude Desktop, Cursor 등 MCP 지원 클라이언트에 legalize-kr을 tool로 
 
 `legalize-mcp`는 로컬 stdio MCP 서버입니다. Claude Desktop, Claude Code, Cursor, Gemini CLI 같은 호스트 앱이 이 명령을 실행하고 표준입출력으로 통신합니다.
 
-0.5.0의 로컬 MCP는 응답 `schema_version: "2.0"`이고 CLI의
-`--json`은 기존 `schema_version: "1.0"`을 유지합니다. 0.5.0은
-PyPI에 게시했으며 고정 버전의 설치와 MCP 도구 목록을 확인했습니다. 별도 `remote-mcp` Worker 0.2.1은 같은 11개 도구와
-MCP 응답 2.0을 HTTPS로 제공합니다. `https://mcp.legalize.kr/mcp`에는 호스트에
-설정한 Bearer 접근키가 필요하며 기존 로컬 stdio 설정을 바꾸지 않습니다.
-원격판의 별도 CPU·입력·비교 크기 제한은 [remote-mcp 안내](https://github.com/legalize-kr/remote-mcp)를 참고하세요.
+0.5.3의 로컬 MCP는 응답 `schema_version: "2.0"`이고 CLI의
+`--json`은 기존 `schema_version: "1.0"`을 유지합니다. 고정 버전은
+`legalize-cli[mcp]==0.5.3`으로 설치합니다.
 
-OpenAI Sites용 서버 구현은 워크스페이스의 `sites-mcp/`에 별도로 준비되어 있습니다.
-배포 후에는 Sites가 생성한 플러그인을 설치하고 OAuth로 연결합니다. 기존 원격 서버의
-Bearer 접근키와는 별도 연결이며, 등록만 완료된 Site를 사용 가능한 서버로 간주하면 안 됩니다.
-Sites용 서버도 같은 11개 도구와 MCP 응답 2.0을 사용합니다. GitHub 토큰이 없는 경우
+원격 MCP는 [Legalize-KR Sites 플러그인](https://chatgpt.legalize.kr)입니다.
+사이트에서 안내하는 플러그인을 설치하고 호스트 앱에서 OAuth로 계정을 연결합니다.
+Sites가 제공하는 연결 정보를 사용하며 로컬 stdio 설치는 필요하지 않습니다.
+원격 MCP도 같은 11개 도구와 MCP 응답 2.0을 제공합니다.
+개인 GitHub 키는 [개인 키 등록 페이지](https://chatgpt.legalize.kr/settings)에서 선택적으로 등록합니다.
+등록한 키는 해당 사용자의 요청에만 사용하며 다른 사용자와 공유하지 않습니다.
+개인 키가 없으면 조회 한도에 걸릴 수 있습니다. GitHub 인증이 없는 경우
 자동 검색은 경로 검색으로 제한되고, 본문 검색을 명시하면 `AUTH_REQUIRED`를 반환합니다.
 
 ### 실행 방식 선택
